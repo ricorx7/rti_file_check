@@ -1,9 +1,6 @@
 from rti_python.Utilities.check_binary_file import RtiCheckFile
-from display_ens import DisplayEnsembles
-from rti_bokeh_server import RtiBokehServer
-from rti_bokeh_plot_manager import RtiBokehPlotManager
 from rti_python.Utilities.config import RtiConfig
-
+from rti_python_plot.matplotlib.display_ens import DisplayEnsembles
 
 class FileDiag():
 
@@ -15,11 +12,11 @@ class FileDiag():
         self.rti_config.init_waves_config()
         self.rti_config.init_plot_server_config()
 
-        self.plot_manager = RtiBokehPlotManager(self.rti_config)
-        self.plot_manager.start()
-        self.bokeh_server = RtiBokehServer(self.rti_config, self.plot_manager)
+        #self.plot_manager = RtiBokehPlotManager(self.rti_config)
+        #self.plot_manager.start()
+        #self.bokeh_server = RtiBokehServer(self.rti_config, self.plot_manager)
 
-        #self.display_ens = DisplayEnsembles()
+        self.display_ens = DisplayEnsembles()
 
         rti_check = RtiCheckFile()
         rti_check.ensemble_event += self.ens_handler
@@ -31,8 +28,8 @@ class FileDiag():
         #if ens.IsEnsembleData:
         #    print(str(ens.EnsembleData.EnsembleNumber))
 
-        #self.display_ens.process_ens(ens)
-        self.plot_manager.update_dashboard_ens(ens)
+        self.display_ens.process_ens(ens)
+        #self.plot_manager.update_dashboard_ens(ens)
 
 
 

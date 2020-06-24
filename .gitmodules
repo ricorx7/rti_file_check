@@ -2,3 +2,6 @@
 	path = rti_python
 	url = https://github.com/rowetechinc/rti_python
 	branch = master
+[submodule "rti_python_plot"]
+	path = rti_python_plot
+	url = https://github.com/rowetechinc/rti_python_plot
