@@ -6,3 +6,4 @@ holoviews
 panel
 streamlit
 plotly
+psycopg2

@@ -6,9 +6,18 @@ from rti_python_plot.bokeh.rti_bokeh_plot_manager import RtiBokehPlotManager
 from rti_python_plot.bokeh.rti_bokeh_server import RtiBokehServer
 from rti_python_plot.streamlit.streamlit_heatmap import StreamlitHeatmap
 from rti_python_plot.streamlit.streamlit_mag_dir_line import StreamlitMagDirLine
-import threading
+from rti_python_plot.streamlit.Streamlit_power_line import StreamlitPowerLine
+from rti_python_plot.streamlit.Streamlit_ancillary_line import StreamlitAncillaryLine
+from rti_python.Writer.rti_sqlite_projects import RtiSqliteProjects
+import os
+import logging
 
-class FileDiag():
+
+# SEt logging level
+logging.basicConfig(level=logging.DEBUG)
+
+
+class FileDiag:
 
     def __init__(self):
 
@@ -20,6 +29,7 @@ class FileDiag():
 
         self.is_screen_data = True
         self.already_got_data = False
+        self.ens_count = 0
 
         # Bokeh Plot
         #self.plot_manager = RtiBokehPlotManager(self.rti_config)
@@ -29,15 +39,41 @@ class FileDiag():
         # Matplotlib plot
         #self.display_ens = DisplayEnsembles()
 
-        # StreamLit heatmap plot
+        # Setup the StreamLit Plots
         self.heatmap = StreamlitHeatmap()
         self.mag_dir_line = StreamlitMagDirLine()
+        self.volt_line = StreamlitPowerLine()
+        self.ancillary_line = StreamlitAncillaryLine()
 
         # On reprocessing in Streamlit, it will through an error if this
         # is rerun because the browser content is not in the main thread
         rti_check = RtiCheckFile()
+
+        # Event handler for ensembles
         rti_check.ensemble_event += self.ens_handler
-        rti_check.select_and_process()
+
+        # Select a file to process
+        #file_paths = rti_check.select_files()
+        file_paths = ["//Beansack/rico/RTI/Data/cs/nav.com.cn/xiamen202007-/01400000000000000000000000000254_xiamen202007_2.ENS"]
+        print(file_paths)
+        # Get the folder path from the first file path
+        #folder_path = os.path.dirname(file_paths[0])
+        folder_path = os.path.join("C:\\", "rti_capture")
+
+        # Create a project file to store the results
+        prj_path = os.path.join(folder_path, "project.db")
+        print(prj_path)
+        self.project = RtiSqliteProjects(file_path=prj_path)
+        prj_idx = self.project.add_prj_sql("project", prj_path)
+
+        # Begin the batch writing to the database
+        self.project.begin_batch("project")
+
+        # Process the selected file
+        rti_check.process(file_paths, show_live_error=False)
+
+        # End any remaing batch
+        self.project.end_batch()
 
         # Plot heatmap
         self.heatmap.get_plot("mag")
@@ -47,8 +83,10 @@ class FileDiag():
         self.mag_dir_line.get_bin_selector()
         self.mag_dir_line.get_plot("mag")
         self.mag_dir_line.get_plot("dir")
+        self.ancillary_line.get_plot()
 
-        #self.display_ens.plot_amp_min_max_avg()
+        # Plot the Voltage
+        self.volt_line.get_plot()
 
 
     def ens_handler(self, sender, ens):
@@ -58,9 +96,23 @@ class FileDiag():
         #self.display_ens.process_ens(ens)
         #self.plot_manager.update_dashboard_ens(ens)
 
-        # Add data to heatmap
+
+        # Add data to the SQLite project
+        self.project.add_ensemble(ens)
+
+        # Write the ensembles to the database in batches
+        # This will write after 10 ensembles
+        self.ens_count = self.ens_count + 1
+        if self.ens_count % 10:
+            self.project.end_batch()
+            self.project.begin_batch("project")
+
+
+        # Add data to plots
         self.heatmap.add_ens(ens)
         self.mag_dir_line.add_ens(ens)
+        self.volt_line.add_ens(ens)
+        self.ancillary_line.add_ens(ens)
 
 
 
