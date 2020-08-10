@@ -112,6 +112,9 @@ class FileDiag:
             if len(prj_json_summary) >= 1:
                 json_str = prj_json_summary[0][0]
                 json_summ = json.loads(json_str)
+                #print(json.dumps(json_summ, indent=1))
+                print(json.dumps(json_summ["errors"], indent=1))
+                print(json.dumps(json_summ["summary"], indent=1))
                 st.title("Summary")
                 st.json(json_summ)
 

@@ -7,3 +7,4 @@ panel
 streamlit
 plotly
 psycopg2
+mttkinter
