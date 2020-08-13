@@ -12,6 +12,7 @@ from rti_python_plot.streamlit.Streamlit_bottomtrack_range_line import Streamlit
 from rti_python_plot.streamlit.Streamlit_bottomtrack_beam_velocity_line import StreamlitBottomTrackBeamVelocityLine
 from rti_python_plot.streamlit.Streamlit_bottomtrack_vessel_speed_line import StreamlitBottomTrackVesselSpeedLine
 from rti_python_plot.streamlit.Streamlit_bottomtrack_vessel_direction_line import StreamlitBottomTrackVesselDirectionLine
+from rti_python_plot.streamlit.Streamlit_mag_heatmap import StreamlitMagHeatmap
 from rti_python.Writer.rti_sqlite_projects import RtiSqliteProjects
 import os
 import logging
@@ -137,13 +138,13 @@ class FileDiag:
             StreamlitBottomTrackRangeLine.get_sqlite_plot(db_path)
 
             # Plot the Bottom Track Beam Velocity with filtering turned on
-            StreamlitBottomTrackBeamVelocityLine.get_sqlite_plot(db_path, filter=True, filter_max=0.5)
+            StreamlitBottomTrackBeamVelocityLine.get_sqlite_plot(db_path, filter=True, filter_max=5.0)
 
             # Plot the Bottom Track Beam Velocity
             StreamlitBottomTrackBeamVelocityLine.get_sqlite_plot(db_path, filter=False)
 
             # Plot the Bottom Track Vessel Speed with filtering turned on
-            StreamlitBottomTrackVesselSpeedLine.get_sqlite_plot(db_path, filter=True, filter_max=0.5)
+            StreamlitBottomTrackVesselSpeedLine.get_sqlite_plot(db_path, filter=True, filter_max=5.0)
 
             # Plot the Bottom Track Vessel Speed
             StreamlitBottomTrackVesselSpeedLine.get_sqlite_plot(db_path, filter=False)
@@ -154,13 +155,15 @@ class FileDiag:
             # Plot the Bottom Track Vessel Direction
             StreamlitBottomTrackVesselDirectionLine.get_sqlite_plot(db_path, filter=False)
 
+            # Plot the Water Magnitude
+            StreamlitMagHeatmap.get_sqlite_plot(db_path)
+
     def ens_handler(self, sender, ens):
         if ens.IsEnsembleData:
             logging.debug(str(ens.EnsembleData.EnsembleNumber))
 
         #self.display_ens.process_ens(ens)
         #self.plot_manager.update_dashboard_ens(ens)
-
 
         # Add data to the SQLite project
         self.project.add_ensemble(ens)
