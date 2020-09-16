@@ -13,6 +13,7 @@ from rti_python_plot.streamlit.Streamlit_bottomtrack_beam_velocity_line import S
 from rti_python_plot.streamlit.Streamlit_bottomtrack_vessel_speed_line import StreamlitBottomTrackVesselSpeedLine
 from rti_python_plot.streamlit.Streamlit_bottomtrack_vessel_direction_line import StreamlitBottomTrackVesselDirectionLine
 from rti_python_plot.streamlit.Streamlit_mag_heatmap import StreamlitMagHeatmap
+from rti_python_plot.streamlit.Streamlit_status_line import StreamlitStatusLine
 from rti_python.Writer.rti_sqlite_projects import RtiSqliteProjects
 import os
 import logging
@@ -130,8 +131,10 @@ class FileDiag:
             #self.ancillary_line.get_plot()
             StreamlitAncillaryLine.get_sqlite_plot(db_path)
 
+            # Plot the Status
+            StreamlitStatusLine.get_sqlite_plot(db_path)
+
             # Plot the Voltage
-            #self.volt_line.get_plot()
             StreamlitPowerLine.get_sqlite_plot(db_path)
 
             # Plot the Bottom Track Range
